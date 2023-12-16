@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+
+  model User{
+   id    String @id @default(auto()) @map("_id") @db.ObjectId
+   name  String?
+   email String @unique
+   verifiedEmail  String?
+   password String?
+   imgage  String?
+   hashedPassword String?
+   createdAt    DateTime @default(now())
+   updatedAt   DateTime  @updatedAt
+   events  Event[] 
+   order    Order[]
+
+}
+
+model Order {
+    id    String @id @default(auto()) @map("_id") @db.ObjectId
+    stripeId  String  @unique
+    totalAmount  String?
+    buyerId     String   @db.ObjectId       
+    OrderId    String  @db.ObjectId   
+    CreatedAt    DateTime @default(now())
+    updatedAt  DateTime   @updatedAt
+    event  Event @relation(fields: [OrderId],references: [id], onDelete:Cascade)  
+    user  User @relation(fields: [OrderId],references: [id], onDelete:Cascade)  
+}
+
+model Event{
+  id String  @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  description String?
+  location String?
+  imageUrl String?
+  price    String?
+  isFree    Boolean?
+  url      String? 
+  userId    String @db.ObjectId
+  startDateTime  DateTime?
+  endDateTime   DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt DateTime  @updatedAt
+  Categorys  Category[] 
+  organizers  Organizer[]
+  orders    Order[]
+  user     User   @relation(fields: [userId], references: [id], onDelete:Cascade)
+}
+
+model Category {
+   id String  @id @default(auto()) @map("_id") @db.ObjectId
+   eventId  String @db.ObjectId
+   name   String?
+   createdAt  DateTime @default(now())  
+   updatedAt   DateTime @updatedAt
+   event  Event @relation(fields: [eventId],references: [id],onDelete:Cascade)
+
+}
+
+model Organizer {
+  id String  @id @default(auto()) @map("_id") @db.ObjectId
+   eventId  String @db.ObjectId
+   name   String?
+   createdAt  DateTime @default(now())  
+   updatedAt   DateTime @updatedAt
+   event  Event @relation(fields: [eventId],references: [id],onDelete:Cascade)
+
+}
+
+
+
+
+
